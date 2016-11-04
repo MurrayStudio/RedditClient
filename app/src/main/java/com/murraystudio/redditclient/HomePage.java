@@ -10,6 +10,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RadioButton;
 
+import java.util.List;
+
 /**
  * Created by sushi_000 on 11/3/2016.
  */
@@ -19,6 +21,8 @@ public class HomePage extends Fragment {
     private static final String KEY_LAYOUT_MANAGER = "layoutManager";
     private static final int SPAN_COUNT = 2;
     private static final int DATASET_COUNT = 60;
+
+    private List<Post> postList;
 
     private enum LayoutManagerType {
         GRID_LAYOUT_MANAGER,
@@ -33,7 +37,7 @@ public class HomePage extends Fragment {
     protected RecyclerView mRecyclerView;
     protected HomePageAdapter mAdapter;
     protected RecyclerView.LayoutManager mLayoutManager;
-    protected String[] mDataset;
+    //protected String[] mDataset;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -66,8 +70,9 @@ public class HomePage extends Fragment {
         }
         setRecyclerViewLayoutManager(mCurrentLayoutManagerType);
 
-        mAdapter = new HomePageAdapter(mDataset);
-        // Set CustomAdapter as the adapter for RecyclerView.
+        mAdapter = new HomePageAdapter(postList);
+
+        // Set HomePageAdapter as the adapter for RecyclerView.
         mRecyclerView.setAdapter(mAdapter);
         setRecyclerViewLayoutManager(LayoutManagerType.LINEAR_LAYOUT_MANAGER);
 
@@ -118,9 +123,12 @@ public class HomePage extends Fragment {
      * from a local content provider or remote server.
      */
     private void initDataset() {
-        mDataset = new String[DATASET_COUNT];
+        MainActivity activity = (MainActivity) getActivity();
+        postList = activity.getPosts();
+
+/*        mDataset = new String[DATASET_COUNT];
         for (int i = 0; i < DATASET_COUNT; i++) {
             mDataset[i] = "This is element #" + i;
-        }
+        }*/
     }
 }

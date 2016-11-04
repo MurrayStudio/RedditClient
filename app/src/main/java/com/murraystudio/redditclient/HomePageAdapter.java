@@ -7,13 +7,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.util.List;
+
 /**
  * Created by sushi_000 on 11/3/2016.
  */
 
 public class HomePageAdapter extends RecyclerView.Adapter<HomePageAdapter.MyViewHolder> {
 
-    private String[] mDataset;
+    private List<Post> postList;
 
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
@@ -30,8 +32,8 @@ public class HomePageAdapter extends RecyclerView.Adapter<HomePageAdapter.MyView
     }
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public HomePageAdapter(String[] myDataset) {
-        mDataset = myDataset;
+    public HomePageAdapter(List<Post> postList) {
+        this.postList = postList;
     }
 
     @Override
@@ -46,11 +48,11 @@ public class HomePageAdapter extends RecyclerView.Adapter<HomePageAdapter.MyView
 
     @Override
     public void onBindViewHolder(HomePageAdapter.MyViewHolder holder, int position) {
-        holder.mTextView.setText(mDataset[position]);
+        holder.mTextView.setText(postList.get(position).title);
     }
 
     @Override
     public int getItemCount() {
-        return mDataset.length;
+        return postList.size();
     }
 }
