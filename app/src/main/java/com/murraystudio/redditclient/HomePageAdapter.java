@@ -55,4 +55,9 @@ public class HomePageAdapter extends RecyclerView.Adapter<HomePageAdapter.MyView
     public int getItemCount() {
         return postList.size();
     }
+
+    public void refresh(List<Post> postList) {
+        this.postList = postList;
+        notifyDataSetChanged();
+    }
 }

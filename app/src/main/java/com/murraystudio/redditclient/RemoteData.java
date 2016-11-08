@@ -3,12 +3,17 @@ package com.murraystudio.redditclient;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class shall serve as a utility class that handles network
@@ -17,6 +22,17 @@ import java.net.URL;
  */
 
 public class RemoteData extends AsyncTask<String, Void, String> {
+
+    HomePage homepage;
+
+    List<Post> postList;
+
+    String after; //for the next set of posts
+
+    public RemoteData(HomePage homepage){
+        this.homepage = homepage;
+    }
+
     /**
      * This methods returns a Connection to the specified URL,
      * with necessary properties like timeout and user-agent
@@ -25,13 +41,6 @@ public class RemoteData extends AsyncTask<String, Void, String> {
      * @param url
      * @return
      */
-
-    MainActivity mainActivity;
-
-    public RemoteData(MainActivity mainActivity){
-        this.mainActivity = mainActivity;
-    }
-
     public static HttpURLConnection getConnection(String url){
         System.out.println("URL: "+url);
         HttpURLConnection hcon = null;
@@ -48,35 +57,6 @@ public class RemoteData extends AsyncTask<String, Void, String> {
         }
         return hcon;
     }
-
-
-/*    *//**
-     * A very handy utility method that reads the contents of a URL
-     * and returns them as a String.
-     *
-     * @param url
-     * @return
-     *//*
-    public static String readContents(String url){
-        HttpURLConnection hcon=getConnection(url);
-        if(hcon==null) return null;
-        try{
-            StringBuffer sb=new StringBuffer(8192);
-            String tmp="";
-            BufferedReader br=new BufferedReader(
-                    new InputStreamReader(
-                            hcon.getInputStream()
-                    )
-            );
-            while((tmp=br.readLine())!=null)
-                sb.append(tmp).append("\n");
-            br.close();
-            return sb.toString();
-        }catch(IOException e){
-            Log.d("READ FAILED", e.toString());
-            return null;
-        }
-    }*/
 
     @Override
     protected String doInBackground(String... url) {
@@ -105,6 +85,43 @@ public class RemoteData extends AsyncTask<String, Void, String> {
     }
 
     protected void onPostExecute(String rawData) {
-        mainActivity.fetchPostExecute(rawData);
+        fetchPostExecute(rawData);
+    }
+
+    public void fetchPostExecute(String rawData){
+        postList = new ArrayList<Post>();
+        String raw = rawData;
+        try{
+            JSONObject data=new JSONObject(raw)
+                    .getJSONObject("data");
+            JSONArray children=data.getJSONArray("children");
+
+            //Using this property we can fetch the next set of
+            //posts from the same subreddit
+            after = data.getString("after");
+
+            for(int i=0;i<children.length();i++){
+                JSONObject cur=children.getJSONObject(i)
+                        .getJSONObject("data");
+                Post p=new Post();
+                p.title=cur.optString("title");
+                p.url=cur.optString("url");
+                p.numComments=cur.optInt("num_comments");
+                p.points=cur.optInt("score");
+                p.author=cur.optString("author");
+                p.subreddit=cur.optString("subreddit");
+                p.permalink=cur.optString("permalink");
+                p.domain=cur.optString("domain");
+                p.id=cur.optString("id");
+                if(p.title!=null) {
+                    postList.add(p);
+                }
+            }
+
+            homepage.onPostFetchComplete(postList); //we are done so alert HomePage fragment class of new data
+
+        }catch(Exception e){
+            Log.e("fetchPosts()",e.toString());
+        }
     }
 }
