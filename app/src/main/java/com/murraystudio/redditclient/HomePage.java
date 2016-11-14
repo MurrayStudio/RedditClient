@@ -84,7 +84,7 @@ public class HomePage extends Fragment implements SwipeRefreshLayout.OnRefreshLi
     }
 
     private void setAdapter(List<Post> postList){
-        mAdapter = new HomePageAdapter(postList);
+        mAdapter = new HomePageAdapter(postList, getActivity());
         // Set HomePageAdapter as the adapter for RecyclerView.
         mRecyclerView.setAdapter(mAdapter);
         setRecyclerViewLayoutManager(LayoutManagerType.LINEAR_LAYOUT_MANAGER);
@@ -135,9 +135,8 @@ public class HomePage extends Fragment implements SwipeRefreshLayout.OnRefreshLi
     }
 
     public void fetchPosts(){
-        //String raw=RemoteData.readContents("https://www.reddit.com/r/planetcoaster/.json?after=AFTER");
         RemoteData remoteData = new RemoteData(this);
-        remoteData.execute("https://www.reddit.com/r/planetcoaster/.json?after=AFTER");
+        remoteData.execute("https://www.reddit.com/r/all/.json?after=AFTER");
     }
 
     public void onPostFetchComplete(List<Post> postList){

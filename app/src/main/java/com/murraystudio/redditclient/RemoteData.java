@@ -101,18 +101,19 @@ public class RemoteData extends AsyncTask<String, Void, String> {
             after = data.getString("after");
 
             for(int i=0;i<children.length();i++){
-                JSONObject cur=children.getJSONObject(i)
+                JSONObject cur = children.getJSONObject(i)
                         .getJSONObject("data");
-                Post p=new Post();
-                p.title=cur.optString("title");
-                p.url=cur.optString("url");
-                p.numComments=cur.optInt("num_comments");
-                p.points=cur.optInt("score");
-                p.author=cur.optString("author");
-                p.subreddit=cur.optString("subreddit");
-                p.permalink=cur.optString("permalink");
-                p.domain=cur.optString("domain");
-                p.id=cur.optString("id");
+                Post p = new Post();
+                p.title = cur.optString("title");
+                p.url = cur.optString("url"); //direct link to media or reddit post.
+                p.selfText = cur.optString("selftext"); //direct link to any text in reddit post
+                p.numComments = cur.optInt("num_comments");
+                p.points = cur.optInt("score");
+                p.author = cur.optString("author");
+                p.subreddit = cur.optString("subreddit");
+                p.permalink = cur.optString("permalink");
+                p.domain = cur.optString("domain");
+                p.id = cur.optString("id");
                 if(p.title!=null) {
                     postList.add(p);
                 }
