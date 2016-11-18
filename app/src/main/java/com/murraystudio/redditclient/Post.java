@@ -13,6 +13,7 @@ public class Post {
     int numComments;
     String permalink;
     String url;
+    String selfText;
     String domain;
     String id;
 

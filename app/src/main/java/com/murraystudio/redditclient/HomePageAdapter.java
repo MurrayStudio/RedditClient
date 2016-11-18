@@ -1,11 +1,15 @@
 package com.murraystudio.redditclient;
 
+import android.app.Activity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.bumptech.glide.Glide;
 
 import java.util.List;
 
@@ -16,24 +20,30 @@ import java.util.List;
 public class HomePageAdapter extends RecyclerView.Adapter<HomePageAdapter.MyViewHolder> {
 
     private List<Post> postList;
+    private Activity activity;
 
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
     // you provide access to all the views for a data item in a view holder
     public static class MyViewHolder extends RecyclerView.ViewHolder {
         public CardView mCardView;
-        public TextView mTextView;
+        public TextView mTitleView;
+        public TextView mPostTextView;
+        public ImageView mImageView;
         public MyViewHolder(View v) {
             super(v);
 
             mCardView = (CardView) v.findViewById(R.id.card_view);
-            mTextView = (TextView) v.findViewById(R.id.tv_text);
+            mTitleView = (TextView) v.findViewById(R.id.title);
+            mPostTextView = (TextView) v.findViewById(R.id.post_text);
+            mImageView = (ImageView) v.findViewById(R.id.media);
         }
     }
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public HomePageAdapter(List<Post> postList) {
+    public HomePageAdapter(List<Post> postList, Activity activity) {
         this.postList = postList;
+        this.activity = activity;
     }
 
     @Override
@@ -48,11 +58,28 @@ public class HomePageAdapter extends RecyclerView.Adapter<HomePageAdapter.MyView
 
     @Override
     public void onBindViewHolder(HomePageAdapter.MyViewHolder holder, int position) {
-        holder.mTextView.setText(postList.get(position).title);
+        holder.mTitleView.setText(postList.get(position).title);
+
+        if (postList.get(position).selfText.isEmpty() == false){
+            holder.mPostTextView.setVisibility(View.VISIBLE);
+            holder.mPostTextView.setText(postList.get(position).selfText);
+        }
+
+        String mediaURL = postList.get(position).url;
+
+        Glide.with(activity)
+                .load(mediaURL)
+                .crossFade()
+                .into(holder.mImageView);
     }
 
     @Override
     public int getItemCount() {
         return postList.size();
+    }
+
+    public void refresh(List<Post> postList) {
+        this.postList = postList;
+        notifyDataSetChanged();
     }
 }

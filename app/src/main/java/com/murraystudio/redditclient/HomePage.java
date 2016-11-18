@@ -2,6 +2,7 @@ package com.murraystudio.redditclient;
 
 import android.app.Fragment;
 import android.os.Bundle;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -16,7 +17,7 @@ import java.util.List;
  * Created by sushi_000 on 11/3/2016.
  */
 
-public class HomePage extends Fragment {
+public class HomePage extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
     private static final String TAG = "RecyclerViewFragment";
     private static final String KEY_LAYOUT_MANAGER = "layoutManager";
     private static final int SPAN_COUNT = 2;
@@ -28,6 +29,8 @@ public class HomePage extends Fragment {
         GRID_LAYOUT_MANAGER,
         LINEAR_LAYOUT_MANAGER
     }
+
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     protected LayoutManagerType mCurrentLayoutManagerType;
 
@@ -43,9 +46,6 @@ public class HomePage extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Initialize dataset, this data would usually come from a local content provider or
-        // remote server.
-        initDataset();
     }
 
     @Override
@@ -53,6 +53,9 @@ public class HomePage extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.home_page, container, false);
         rootView.setTag(TAG);
+
+        swipeRefreshLayout =  (SwipeRefreshLayout) rootView.findViewById(R.id.home_page_swipe_refresh);
+        swipeRefreshLayout.setOnRefreshListener(this);
 
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.home_page_recycler_view);
 
@@ -70,13 +73,21 @@ public class HomePage extends Fragment {
         }
         setRecyclerViewLayoutManager(mCurrentLayoutManagerType);
 
-        mAdapter = new HomePageAdapter(postList);
+        if(postList == null || postList.size() == 0) {
+            fetchPosts();
+        }
+        else{
+            setAdapter(postList);
+        }
 
+        return rootView;
+    }
+
+    private void setAdapter(List<Post> postList){
+        mAdapter = new HomePageAdapter(postList, getActivity());
         // Set HomePageAdapter as the adapter for RecyclerView.
         mRecyclerView.setAdapter(mAdapter);
         setRecyclerViewLayoutManager(LayoutManagerType.LINEAR_LAYOUT_MANAGER);
-
-        return rootView;
     }
 
     /**
@@ -118,17 +129,24 @@ public class HomePage extends Fragment {
         super.onSaveInstanceState(savedInstanceState);
     }
 
-    /**
-     * Generates Strings for RecyclerView's adapter. This data would usually come
-     * from a local content provider or remote server.
-     */
-    private void initDataset() {
-        MainActivity activity = (MainActivity) getActivity();
-        postList = activity.getPosts();
+    @Override
+    public void onRefresh() {
+        fetchPosts();
+    }
 
-/*        mDataset = new String[DATASET_COUNT];
-        for (int i = 0; i < DATASET_COUNT; i++) {
-            mDataset[i] = "This is element #" + i;
-        }*/
+    public void fetchPosts(){
+        RemoteData remoteData = new RemoteData(this);
+        remoteData.execute("https://www.reddit.com/r/all/.json?after=AFTER");
+    }
+
+    public void onPostFetchComplete(List<Post> postList){
+        this.postList = postList;
+        swipeRefreshLayout.setRefreshing(false);
+        if(mAdapter != null) {
+            mAdapter.refresh(postList);
+        }
+        else{
+            setAdapter(postList);
+        }
     }
 }
