@@ -1,5 +1,6 @@
 package com.murraystudio.redditclient;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -53,6 +54,8 @@ public class MainActivity extends AppCompatActivity {
 
         postList = new ArrayList<Post>();
         fetchPosts();
+        Intent myIntent = new Intent(this, Login.class);
+        this.startActivity(myIntent);
 
 
     }
