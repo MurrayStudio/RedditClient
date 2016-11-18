@@ -1,16 +1,11 @@
 package com.murraystudio.redditclient;
 
-import android.app.DownloadManager;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Base64;
 import android.util.Log;
-import android.view.View;
-import android.widget.Button;
-import android.view.View.OnClickListener;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -25,38 +20,25 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
+import static com.murraystudio.redditclient.MainActivity.ACCESS_TOKEN_URL;
+import static com.murraystudio.redditclient.MainActivity.CLIENT_ID;
+import static com.murraystudio.redditclient.MainActivity.REDIRECT_URI;
+import static com.murraystudio.redditclient.MainActivity.STATE;
+
 /**
  * Created by yoyoma207 on 11/17/2016.
  */
 
 public class Login extends AppCompatActivity {
-    private static final String AUTH_URL =
-            "https://www.reddit.com/api/v1/authorize.compact?client_id=%s" +
-                    "&response_type=code&state=%s&redirect_uri=%s&" +
-                    "duration=permanent&scope=identity";
-
-    private static final String CLIENT_ID = "ABCDEFGHIJKLM012345-AA";
-
-    private static final String REDIRECT_URI =
-            "http://www.example.com/my_redirect";
-
-    private static final String STATE = "MY_RANDOM_STRING_1";
-
-    private static final String ACCESS_TOKEN_URL =
-            "https://www.reddit.com/api/v1/access_token";
     OkHttpClient client;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.loginlayout);
-        startSignIn(null);
+        //startSignIn(null);
 
-    }
-    public void startSignIn(View view) {
-        String url = String.format(AUTH_URL, CLIENT_ID, STATE, REDIRECT_URI);
-        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-        startActivity(intent);
     }
 
 
@@ -64,9 +46,11 @@ public class Login extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
-        if(getIntent()!=null) {
-            if (getIntent().getAction().equals(Intent.ACTION_VIEW)) {
-                Uri uri = getIntent().getData();
+        Intent redditIntent = getIntent();
+
+        if(redditIntent != null) {
+            if (redditIntent.getAction().equals(Intent.ACTION_VIEW)) {
+                Uri uri = redditIntent.getData();
                 if (uri.getQueryParameter("error") != null) {
                     String error = uri.getQueryParameter("error");
                 } else {
