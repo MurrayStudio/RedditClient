@@ -1,37 +1,70 @@
 package com.murraystudio.redditclient;
 
+import android.app.Activity;
+import android.app.Dialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
+import android.widget.Button;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import org.json.JSONException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
 
-    public static final String AUTH_URL =
+/*    public static final String AUTH_URL =
             "https://www.reddit.com/api/v1/authorize.compact?client_id=%s" +
                     "&response_type=code&state=%s&redirect_uri=%s&" +
-                    "duration=permanent&scope=identity";
+                    "duration=permanent&scope=identity";*/
 
-    public static final String CLIENT_ID = "ABCDEFGHIJKLM012345-AA";
 
-    public static final String REDIRECT_URI = "http://www.example.com/my_redirect";
+/*    public static final String STATE = "MY_RANDOM_STRING_1";
 
-    public static final String STATE = "MY_RANDOM_STRING_1";
+    public static final String ACCESS_TOKEN_URL = "https://www.reddit.com/api/v1/access_token";*/
 
-    public static final String ACCESS_TOKEN_URL = "https://www.reddit.com/api/v1/access_token";
+
+    private static String CLIENT_ID = "LZJx8vb6JeAJLQ";
+    //private static String CLIENT_SECRET ="";
+    private static String REDIRECT_URI = "http://www.example.com/my_redirect";
+    private static String GRANT_TYPE = "https://oauth.reddit.com/grants/installed_client";
+    private static String GRANT_TYPE2 = "authorization_code";
+    private static String TOKEN_URL = "access_token";
+    private static String OAUTH_URL = "https://www.reddit.com/api/v1/authorize";
+    private static String OAUTH_SCOPE = "read";
+    private static String DURATION = "permanent";
+
+    WebView web;
+    Button auth;
+    SharedPreferences pref;
+    TextView Access;
+    Dialog auth_view;
+    String DEVICE_ID = UUID.randomUUID().toString();
+    String authCode;
+    boolean authComplete = false;
+
+    Intent resultIntent = new Intent();
 
     List<Post> postList;
 
     String after; //for the next set of posts
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,14 +106,79 @@ public class MainActivity extends AppCompatActivity {
         getFragmentManager().beginTransaction().replace(R.id.fragment_container, homePageFragment).addToBackStack(null).commit();
 
 
-        startSignIn(null);
+        pref = getSharedPreferences("AppPref", MODE_PRIVATE);
+        // TODO Auto-generated method stub
+        auth_view = new Dialog(MainActivity.this);
+        auth_view.setContentView(R.layout.auth_view);
+        web = (WebView) auth_view.findViewById(R.id.webv);
+        web.getSettings().setJavaScriptEnabled(true);
+        String url = OAUTH_URL + "?client_id=" + CLIENT_ID + "&response_type=code&state=TEST&redirect_uri=" + REDIRECT_URI + "&scope=" + OAUTH_SCOPE;
+        web.loadUrl(url);
+        Toast.makeText(getApplicationContext(), "" + url, Toast.LENGTH_LONG).show();
+
+        web.setWebViewClient(new WebViewClient() {
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                view.loadUrl(url);
+                return true;
+            }
+
+            @Override
+            public void onPageStarted(WebView view, String url, Bitmap favicon) {
+                super.onPageStarted(view, url, favicon);
+
+            }
+
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                super.onPageFinished(view, url);
+
+                if (url.contains("?code=") || url.contains("&code=")) {
+
+                    Uri uri = Uri.parse(url);
+                    authCode = uri.getQueryParameter("code");
+                    Log.i("", "CODE : " + authCode);
+                    authComplete = true;
+                    resultIntent.putExtra("code", authCode);
+                    MainActivity.this.setResult(Activity.RESULT_OK, resultIntent);
+                    setResult(Activity.RESULT_CANCELED, resultIntent);
+                    SharedPreferences.Editor edit = pref.edit();
+                    edit.putString("Code", authCode);
+                    edit.commit();
+                    auth_view.dismiss();
+                    Toast.makeText(getApplicationContext(), "Authorization Code is: " + pref.getString("Code", ""), Toast.LENGTH_SHORT).show();
+
+                    try {
+                        new Login(getApplicationContext()).getToken(TOKEN_URL, GRANT_TYPE2, DEVICE_ID);
+                        Toast.makeText(getApplicationContext(), "Auccess Token: " + pref.getString("token", ""), Toast.LENGTH_SHORT).show();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                } else if (url.contains("error=access_denied")) {
+                    Log.i("", "ACCESS_DENIED_HERE");
+                    resultIntent.putExtra("code", authCode);
+                    authComplete = true;
+                    setResult(Activity.RESULT_CANCELED, resultIntent);
+                    Toast.makeText(getApplicationContext(), "Error Occured", Toast.LENGTH_SHORT).show();
+
+                    auth_view.dismiss();
+                }
+            }
+        });
+        auth_view.show();
+        auth_view.setTitle("Authorize");
+        auth_view.setCancelable(true);
+
+
+        //startSignIn(null);
     }
 
-    public void startSignIn(View view) {
+/*    public void startSignIn(View view) {
         String url = String.format(AUTH_URL, CLIENT_ID, STATE, REDIRECT_URI);
         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
         startActivity(intent);
-    }
+    }*/
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
