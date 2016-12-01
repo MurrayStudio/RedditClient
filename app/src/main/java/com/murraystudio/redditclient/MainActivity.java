@@ -29,19 +29,7 @@ import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
 
-/*    public static final String AUTH_URL =
-            "https://www.reddit.com/api/v1/authorize.compact?client_id=%s" +
-                    "&response_type=code&state=%s&redirect_uri=%s&" +
-                    "duration=permanent&scope=identity";*/
-
-
-/*    public static final String STATE = "MY_RANDOM_STRING_1";
-
-    public static final String ACCESS_TOKEN_URL = "https://www.reddit.com/api/v1/access_token";*/
-
-
     private static String CLIENT_ID = "LZJx8vb6JeAJLQ";
-    //private static String CLIENT_SECRET ="";
     private static String REDIRECT_URI = "http://www.example.com/my_redirect";
     private static String GRANT_TYPE = "https://oauth.reddit.com/grants/installed_client";
     private static String GRANT_TYPE2 = "authorization_code";
@@ -49,6 +37,8 @@ public class MainActivity extends AppCompatActivity {
     private static String OAUTH_URL = "https://www.reddit.com/api/v1/authorize";
     private static String OAUTH_SCOPE = "read";
     private static String DURATION = "permanent";
+
+    private HomePage homePageFragment;
 
     WebView web;
     Button auth;
@@ -100,12 +90,15 @@ public class MainActivity extends AppCompatActivity {
         //this.startActivity(myIntent);
 
         // Create a new Fragment to be placed in the activity layout
-        HomePage homePageFragment = new HomePage();
+        homePageFragment = new HomePage();
         // Replace whatever is in the fragment_container view with this fragment,
         // and add the transaction to the back stack so the user can navigate back
         getFragmentManager().beginTransaction().replace(R.id.fragment_container, homePageFragment).addToBackStack(null).commit();
 
+        //startSignIn();
+    }
 
+    public void startSignIn() {
         pref = getSharedPreferences("AppPref", MODE_PRIVATE);
         // TODO Auto-generated method stub
         auth_view = new Dialog(MainActivity.this);
@@ -150,7 +143,7 @@ public class MainActivity extends AppCompatActivity {
 
                     try {
                         new Login(getApplicationContext()).getToken(TOKEN_URL, GRANT_TYPE2, DEVICE_ID);
-                        Toast.makeText(getApplicationContext(), "Auccess Token: " + pref.getString("token", ""), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), "Access Token: " + pref.getString("token", ""), Toast.LENGTH_SHORT).show();
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -171,14 +164,9 @@ public class MainActivity extends AppCompatActivity {
         auth_view.setCancelable(true);
 
 
-        //startSignIn(null);
-    }
 
-/*    public void startSignIn(View view) {
-        String url = String.format(AUTH_URL, CLIENT_ID, STATE, REDIRECT_URI);
-        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-        startActivity(intent);
-    }*/
+        homePageFragment.fetchPosts2();
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -195,7 +183,8 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.log_in) {
+            startSignIn();
             return true;
         }
 

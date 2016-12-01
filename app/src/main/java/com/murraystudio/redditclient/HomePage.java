@@ -3,6 +3,7 @@ package com.murraystudio.redditclient;
 import android.app.Fragment;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -73,6 +74,9 @@ public class HomePage extends Fragment implements SwipeRefreshLayout.OnRefreshLi
         }
         setRecyclerViewLayoutManager(mCurrentLayoutManagerType);
 
+
+
+
         if(postList == null || postList.size() == 0) {
             fetchPosts();
         }
@@ -131,12 +135,18 @@ public class HomePage extends Fragment implements SwipeRefreshLayout.OnRefreshLi
 
     @Override
     public void onRefresh() {
-        fetchPosts();
+        fetchPosts2();
     }
 
     public void fetchPosts(){
-        RemoteData remoteData = new RemoteData(this);
-        remoteData.execute("https://www.reddit.com/r/all/.json?after=AFTER");
+        new RemoteData(this).execute("https://www.reddit.com/r/funny/.json");
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("r/all");
+    }
+
+    public void fetchPosts2(){
+
+        new RemoteData(this).execute("https://www.reddit.com/.json");
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Frontpage");
     }
 
     public void onPostFetchComplete(List<Post> postList){

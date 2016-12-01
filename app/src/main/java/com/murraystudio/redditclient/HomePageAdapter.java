@@ -64,6 +64,11 @@ public class HomePageAdapter extends RecyclerView.Adapter<HomePageAdapter.MyView
             holder.mPostTextView.setVisibility(View.VISIBLE);
             holder.mPostTextView.setText(postList.get(position).selfText);
         }
+        else{
+            //need an else so when the recycle happens it doesn't create text in wrong places
+            holder.mPostTextView.setVisibility(View.GONE);
+            holder.mPostTextView.setText("");
+        }
 
         String mediaURL = postList.get(position).url;
 
