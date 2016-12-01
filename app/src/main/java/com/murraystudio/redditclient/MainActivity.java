@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
     private static String GRANT_TYPE2 = "authorization_code";
     private static String TOKEN_URL = "access_token";
     private static String OAUTH_URL = "https://www.reddit.com/api/v1/authorize";
-    private static String OAUTH_SCOPE = "read";
+    private static String OAUTH_SCOPE = "identity,read,mysubreddits";
     private static String DURATION = "permanent";
 
     private HomePage homePageFragment;

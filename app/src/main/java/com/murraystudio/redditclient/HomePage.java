@@ -139,13 +139,13 @@ public class HomePage extends Fragment implements SwipeRefreshLayout.OnRefreshLi
     }
 
     public void fetchPosts(){
-        new RemoteData(this).execute("https://www.reddit.com/r/funny/.json");
+        new RemoteData(this).execute("https://www.reddit.com/r/all/.json");
         ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("r/all");
     }
 
     public void fetchPosts2(){
 
-        new RemoteData(this).execute("https://www.reddit.com/.json");
+        new RemoteData(this).execute("https://oauth.reddit.com/.json");
         ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Frontpage");
     }
 

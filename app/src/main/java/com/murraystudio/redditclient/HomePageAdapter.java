@@ -29,6 +29,7 @@ public class HomePageAdapter extends RecyclerView.Adapter<HomePageAdapter.MyView
         public CardView mCardView;
         public TextView mTitleView;
         public TextView mPostTextView;
+        public TextView mSubredditTextView;
         public ImageView mImageView;
         public MyViewHolder(View v) {
             super(v);
@@ -36,6 +37,7 @@ public class HomePageAdapter extends RecyclerView.Adapter<HomePageAdapter.MyView
             mCardView = (CardView) v.findViewById(R.id.card_view);
             mTitleView = (TextView) v.findViewById(R.id.title);
             mPostTextView = (TextView) v.findViewById(R.id.post_text);
+            mSubredditTextView = (TextView) v.findViewById(R.id.subreddit);
             mImageView = (ImageView) v.findViewById(R.id.media);
         }
     }
@@ -59,6 +61,7 @@ public class HomePageAdapter extends RecyclerView.Adapter<HomePageAdapter.MyView
     @Override
     public void onBindViewHolder(HomePageAdapter.MyViewHolder holder, int position) {
         holder.mTitleView.setText(postList.get(position).title);
+        holder.mSubredditTextView.setText(postList.get(position).subreddit);
 
         if (postList.get(position).selfText.isEmpty() == false){
             holder.mPostTextView.setVisibility(View.VISIBLE);
