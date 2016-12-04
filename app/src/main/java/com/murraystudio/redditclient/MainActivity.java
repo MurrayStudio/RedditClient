@@ -29,16 +29,20 @@ import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static String CLIENT_ID = "LZJx8vb6JeAJLQ";
-    private static String REDIRECT_URI = "http://www.example.com/my_redirect";
-    private static String GRANT_TYPE = "https://oauth.reddit.com/grants/installed_client";
-    private static String GRANT_TYPE2 = "authorization_code";
-    private static String TOKEN_URL = "access_token";
-    private static String OAUTH_URL = "https://www.reddit.com/api/v1/authorize";
-    private static String OAUTH_SCOPE = "identity,read,mysubreddits";
-    private static String DURATION = "permanent";
+    public static String CLIENT_ID = "LZJx8vb6JeAJLQ";
+    public static String REDIRECT_URI = "http://localhost";
+    public static String GRANT_TYPE = "https://oauth.reddit.com/grants/installed_client";
+    public static String GRANT_TYPE2 = "authorization_code";
+    public static String TOKEN_URL = "access_token";
+    public static String OAUTH_URL = "https://www.reddit.com/api/v1/authorize";
+    public static String OAUTH_URL2 = "https://www.reddit.com/api/v1/access_token";
+    public static String OAUTH_SCOPE = "identity,read,mysubreddits";
+    public static String DURATION = "permanent";
+    public static String CLIENT_SECRET ="";
 
     private HomePage homePageFragment;
+
+    private Login login;
 
     WebView web;
     Button auth;
@@ -130,7 +134,9 @@ public class MainActivity extends AppCompatActivity {
 
                     Uri uri = Uri.parse(url);
                     authCode = uri.getQueryParameter("code");
-                    Log.i("", "CODE : " + authCode);
+                    Log.i("authCode", "CODE : " + authCode);
+                    Log.i("error", "ERROR : " + uri.getQueryParameter("error"));
+                    Log.i("state", "STATE : " + uri.getQueryParameter("state"));
                     authComplete = true;
                     resultIntent.putExtra("code", authCode);
                     MainActivity.this.setResult(Activity.RESULT_OK, resultIntent);
@@ -142,7 +148,10 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), "Authorization Code is: " + pref.getString("Code", ""), Toast.LENGTH_SHORT).show();
 
                     try {
-                        new Login(getApplicationContext()).getToken(TOKEN_URL, GRANT_TYPE2, DEVICE_ID);
+                        login = new Login(getApplicationContext());
+                        login.getToken(TOKEN_URL, GRANT_TYPE2, DEVICE_ID);
+
+                        login.getUsername();
                         Toast.makeText(getApplicationContext(), "Access Token: " + pref.getString("token", ""), Toast.LENGTH_SHORT).show();
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -165,7 +174,7 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-        homePageFragment.fetchPosts2();
+        //homePageFragment.fetchPosts2();
     }
 
     @Override

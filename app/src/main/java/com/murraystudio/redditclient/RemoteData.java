@@ -47,7 +47,7 @@ public class RemoteData extends AsyncTask<String, Void, String> {
         try {
             hcon=(HttpURLConnection)new URL(url).openConnection();
             hcon.setReadTimeout(30000); // Timeout at 30 seconds
-            hcon.setRequestProperty("User-Agent", "Alien V1.0");
+            //hcon.setRequestProperty("User-Agent", "Alien V1.0");
         } catch (MalformedURLException e) {
             Log.e("getConnection()",
                     "Invalid URL: "+e.toString());

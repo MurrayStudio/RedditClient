@@ -15,6 +15,11 @@ import org.json.JSONObject;
 import cz.msebera.android.httpclient.Header;
 import cz.msebera.android.httpclient.message.BasicHeader;
 
+import static com.murraystudio.redditclient.MainActivity.CLIENT_ID;
+import static com.murraystudio.redditclient.MainActivity.CLIENT_SECRET;
+import static com.murraystudio.redditclient.MainActivity.OAUTH_URL2;
+import static com.murraystudio.redditclient.MainActivity.REDIRECT_URI;
+
 /**
  * Created by yoyoma207 on 11/17/2016.
  */
@@ -23,10 +28,10 @@ public class Login {
     SharedPreferences pref;
     String token;
     Context context;
-    private static String CLIENT_ID = "YOUR CLIENT_ID";
-    private static String CLIENT_SECRET ="";
-    private static final String BASE_URL = "https://www.reddit.com/api/v1/";
-    private static String REDIRECT_URI="YOUR reddit_uri(as per your reddit app preferences)";
+    //private static String CLIENT_ID = "YOUR CLIENT_ID";
+    //private static String CLIENT_SECRET ="";
+    //private static final String BASE_URL = "https://www.reddit.com/api/v1/";
+    //private static String REDIRECT_URI="YOUR reddit_uri(as per your reddit app preferences)";
 
     Login(Context cnt){
         context = cnt;
@@ -43,13 +48,13 @@ public class Login {
     }
 
     private static String getAbsoluteUrl(String relativeUrl) {
-        return BASE_URL + relativeUrl;
+        return OAUTH_URL2;
     }
 
     public void getToken(String relativeUrl,String grant_type,String device_id) throws JSONException {
         client.setBasicAuth(CLIENT_ID,CLIENT_SECRET);
         pref = context.getSharedPreferences("AppPref",Context.MODE_PRIVATE);
-        String code =pref.getString("Code", "");
+        String code = pref.getString("Code", "N/A");
 
         RequestParams requestParams = new RequestParams();
         requestParams.put("code",code);
@@ -66,7 +71,7 @@ public class Login {
                     SharedPreferences.Editor edit = pref.edit();
                     edit.putString("token",token);
                     edit.commit();
-                    Log.i("Access_token",pref.getString("token",""));
+                    Log.i("Access_token",pref.getString("token","N/A"));
                 }catch (JSONException j)
                 {
                     j.printStackTrace();
@@ -78,6 +83,8 @@ public class Login {
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
                 //super.onFailure(statusCode, headers, throwable, errorResponse);
                 Log.i("statusCode", "" + statusCode);
+
+                Log.i("JSON error", errorResponse.toString());
 
 
             }
@@ -131,6 +138,7 @@ public class Login {
                 Log.i("response", response.toString());
                 try {
                     String username = response.getString("name").toString();
+                    Log.i("username", "username: " + username);
                     SharedPreferences.Editor edit = pref.edit();
                     edit.putString("username", username);
                     edit.commit();
