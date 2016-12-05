@@ -151,7 +151,12 @@ public class MainActivity extends AppCompatActivity {
                         login = new Login(getApplicationContext());
                         login.getToken(TOKEN_URL, GRANT_TYPE2, DEVICE_ID);
 
+
                         login.getUsername();
+                        homePageFragment.fetchPosts2();
+
+
+
                         Toast.makeText(getApplicationContext(), "Access Token: " + pref.getString("token", ""), Toast.LENGTH_SHORT).show();
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -173,8 +178,6 @@ public class MainActivity extends AppCompatActivity {
         auth_view.setCancelable(true);
 
 
-
-        //homePageFragment.fetchPosts2();
     }
 
     @Override

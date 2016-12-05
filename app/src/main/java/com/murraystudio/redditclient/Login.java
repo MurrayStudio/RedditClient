@@ -135,7 +135,7 @@ public class Login {
 
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                Log.i("response", response.toString());
+                Log.i("response username", response.toString());
                 try {
                     String username = response.getString("name").toString();
                     Log.i("username", "username: " + username);

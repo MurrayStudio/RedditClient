@@ -5,12 +5,14 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
+import com.loopj.android.http.SyncHttpClient;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import cz.msebera.android.httpclient.Header;
@@ -22,7 +24,6 @@ import static com.murraystudio.redditclient.MainActivity.CLIENT_SECRET;
 /**
  * This class shall serve as a utility class that handles network
  * connections.
- *
  */
 
 public class RemoteDataOAuth extends AsyncTask<String, Void, String> {
@@ -33,17 +34,19 @@ public class RemoteDataOAuth extends AsyncTask<String, Void, String> {
 
     String after; //for the next set of posts
 
-    private static AsyncHttpClient client;
+    private static SyncHttpClient client;
     private SharedPreferences pref;
 
-    public RemoteDataOAuth(HomePage homepage){
+    private JSONArray children;
+
+    public RemoteDataOAuth(HomePage homepage) {
         this.homepage = homepage;
         init();
     }
 
-    private void init(){
-        client = new AsyncHttpClient();
-        client.setBasicAuth(CLIENT_ID,CLIENT_SECRET);
+    private void init() {
+        client = new SyncHttpClient();
+        client.setBasicAuth(CLIENT_ID, CLIENT_SECRET);
 
         pref = homepage.getActivity().getSharedPreferences("AppPref", Context.MODE_PRIVATE);
     }
@@ -58,19 +61,16 @@ public class RemoteDataOAuth extends AsyncTask<String, Void, String> {
         headers[0] = new BasicHeader("User-Agent", "myRedditapp/0.1 by redditusername");
         headers[1] = new BasicHeader("Authorization", "bearer " + pref.getString("token", ""));
 
-        client.get(homepage.getActivity(), "https://oauth.reddit.com/api/v1/me", headers, null, new JsonHttpResponseHandler() {
+        client.get(homepage.getActivity(), "https://oauth.reddit.com", headers, null, new JsonHttpResponseHandler() {
 
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                Log.i("response", response.toString());
+                Log.i("response frontpage", response.toString());
+
                 try {
-                    String username = response.getString("name").toString();
-                    Log.i("username", "username: " + username);
-                    SharedPreferences.Editor edit = pref.edit();
-                    edit.putString("username", username);
-                    edit.commit();
-                } catch (JSONException j) {
-                    j.printStackTrace();
+                    children = response.getJSONObject("data").getJSONArray("children");
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
 
             }
@@ -86,10 +86,39 @@ public class RemoteDataOAuth extends AsyncTask<String, Void, String> {
     }
 
     protected void onPostExecute(String rawData) {
-        fetchPostExecute(rawData);
+        if (children != null){
+            fetchPostExecute();
+        }
     }
 
-    public void fetchPostExecute(String rawData){
+    public void fetchPostExecute() {
 
+        postList = new ArrayList<Post>();
+
+        try {
+            for (int i = 0; i < children.length(); i++) {
+                JSONObject cur = children.getJSONObject(i)
+                        .getJSONObject("data");
+                Post p = new Post();
+                p.title = cur.optString("title");
+                p.url = cur.optString("url"); //direct link to media or reddit post.
+                p.selfText = cur.optString("selftext"); //direct link to any text in reddit post
+                p.numComments = cur.optInt("num_comments");
+                p.points = cur.optInt("score");
+                p.author = cur.optString("author");
+                p.subreddit = cur.optString("subreddit");
+                p.permalink = cur.optString("permalink");
+                p.domain = cur.optString("domain");
+                p.id = cur.optString("id");
+                if (p.title != null) {
+                    postList.add(p);
+                }
+            }
+
+            homepage.onPostFetchComplete(postList); //we are done so alert HomePage fragment class of new data
+
+        } catch (Exception e) {
+            Log.e("RemoteDataOAuth()", e.toString());
+        }
     }
 }

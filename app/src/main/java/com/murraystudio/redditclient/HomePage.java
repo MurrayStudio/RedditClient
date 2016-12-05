@@ -145,7 +145,7 @@ public class HomePage extends Fragment implements SwipeRefreshLayout.OnRefreshLi
 
     public void fetchPosts2(){
 
-        new RemoteData(this).execute("https://oauth.reddit.com/.json");
+        new RemoteDataOAuth(this).execute("https://oauth.reddit.com/.json");
         ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Frontpage");
     }
 
