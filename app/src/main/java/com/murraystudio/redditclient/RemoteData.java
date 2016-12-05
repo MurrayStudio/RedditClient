@@ -23,11 +23,9 @@ import java.util.List;
 
 public class RemoteData extends AsyncTask<String, Void, String> {
 
-    HomePage homepage;
-
-    List<Post> postList;
-
-    String after; //for the next set of posts
+    private HomePage homepage;
+    private List<Post> postList;
+    private String after; //for the next set of posts
 
     public RemoteData(HomePage homepage){
         this.homepage = homepage;

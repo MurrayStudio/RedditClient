@@ -24,6 +24,8 @@ public class HomePage extends Fragment implements SwipeRefreshLayout.OnRefreshLi
     private static final int SPAN_COUNT = 2;
     private static final int DATASET_COUNT = 60;
 
+    private String currentSubreddit = "all";
+
     private List<Post> postList;
 
     private enum LayoutManagerType {
@@ -78,7 +80,7 @@ public class HomePage extends Fragment implements SwipeRefreshLayout.OnRefreshLi
 
 
         if(postList == null || postList.size() == 0) {
-            fetchPosts();
+            fetchPosts("all");
         }
         else{
             setAdapter(postList);
@@ -135,17 +137,17 @@ public class HomePage extends Fragment implements SwipeRefreshLayout.OnRefreshLi
 
     @Override
     public void onRefresh() {
-        fetchPosts2();
+        fetchPosts(currentSubreddit);
     }
 
-    public void fetchPosts(){
-        new RemoteData(this).execute("https://www.reddit.com/r/all/.json");
-        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("r/all");
+    public void fetchPosts(String subreddit) {
+        new RemoteData(this).execute("https://www.reddit.com/r/" + subreddit + "/.json");
+        currentSubreddit = subreddit;
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("r/" + subreddit);
     }
 
     public void fetchPosts2(){
-
-        new RemoteDataOAuth(this).execute("https://oauth.reddit.com/.json");
+        new RemoteDataOAuth(this).execute("https://oauth.reddit.com");
         ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Frontpage");
     }
 

@@ -2,13 +2,14 @@ package com.murraystudio.redditclient;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -18,6 +19,7 @@ import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,7 +33,6 @@ public class MainActivity extends AppCompatActivity {
 
     public static String CLIENT_ID = "LZJx8vb6JeAJLQ";
     public static String REDIRECT_URI = "http://localhost";
-    public static String GRANT_TYPE = "https://oauth.reddit.com/grants/installed_client";
     public static String GRANT_TYPE2 = "authorization_code";
     public static String TOKEN_URL = "access_token";
     public static String OAUTH_URL = "https://www.reddit.com/api/v1/authorize";
@@ -59,7 +60,6 @@ public class MainActivity extends AppCompatActivity {
 
     String after; //for the next set of posts
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -67,19 +67,9 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-
         // Check that the activity is using the layout version with
         // the fragment_container FrameLayout
         if (findViewById(R.id.fragment_container) != null) {
-
             // However, if we're being restored from a previous state,
             // then we don't need to do anything and should return or else
             // we could end up with overlapping fragments.
@@ -88,18 +78,45 @@ public class MainActivity extends AppCompatActivity {
             }
 
         }
-
         postList = new ArrayList<Post>();
-        //Intent myIntent = new Intent(this, Login.class);
-        //this.startActivity(myIntent);
 
+        
         // Create a new Fragment to be placed in the activity layout
         homePageFragment = new HomePage();
         // Replace whatever is in the fragment_container view with this fragment,
         // and add the transaction to the back stack so the user can navigate back
-        getFragmentManager().beginTransaction().replace(R.id.fragment_container, homePageFragment).addToBackStack(null).commit();
+        getFragmentManager().beginTransaction().replace(R.id.fragment_container, homePageFragment).commit();
 
-        //startSignIn();
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                subredditSearch();
+            }
+        });
+    }
+
+    private void subredditSearch(){
+        AlertDialog.Builder alert = new AlertDialog.Builder(this);
+        final EditText edittext = new EditText(this);
+        edittext.setHint("askreddit");
+        alert.setTitle("Navigate to a Subreddit");
+        alert.setView(edittext);
+
+        alert.setPositiveButton("Go", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                String subredditString = edittext.getText().toString();
+                homePageFragment.fetchPosts(subredditString);
+            }
+        });
+
+        alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                // what ever you want to do with No option.
+            }
+        });
+
+        alert.show();
     }
 
     public void startSignIn() {
@@ -111,7 +128,7 @@ public class MainActivity extends AppCompatActivity {
         web.getSettings().setJavaScriptEnabled(true);
         String url = OAUTH_URL + "?client_id=" + CLIENT_ID + "&response_type=code&state=TEST&redirect_uri=" + REDIRECT_URI + "&scope=" + OAUTH_SCOPE;
         web.loadUrl(url);
-        Toast.makeText(getApplicationContext(), "" + url, Toast.LENGTH_LONG).show();
+        //Toast.makeText(getApplicationContext(), "" + url, Toast.LENGTH_LONG).show();
 
         web.setWebViewClient(new WebViewClient() {
             @Override
@@ -145,19 +162,13 @@ public class MainActivity extends AppCompatActivity {
                     edit.putString("Code", authCode);
                     edit.commit();
                     auth_view.dismiss();
-                    Toast.makeText(getApplicationContext(), "Authorization Code is: " + pref.getString("Code", ""), Toast.LENGTH_SHORT).show();
-
+                    //Toast.makeText(getApplicationContext(), "Authorization Code is: " + pref.getString("Code", ""), Toast.LENGTH_SHORT).show();
                     try {
                         login = new Login(getApplicationContext());
                         login.getToken(TOKEN_URL, GRANT_TYPE2, DEVICE_ID);
-
-
                         login.getUsername();
                         homePageFragment.fetchPosts2();
-
-
-
-                        Toast.makeText(getApplicationContext(), "Access Token: " + pref.getString("token", ""), Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(getApplicationContext(), "Access Token: " + pref.getString("token", ""), Toast.LENGTH_SHORT).show();
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }

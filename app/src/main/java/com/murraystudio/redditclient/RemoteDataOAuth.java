@@ -28,15 +28,11 @@ import static com.murraystudio.redditclient.MainActivity.CLIENT_SECRET;
 
 public class RemoteDataOAuth extends AsyncTask<String, Void, String> {
 
-    HomePage homepage;
-
-    List<Post> postList;
-
-    String after; //for the next set of posts
+    private HomePage homepage;
+    private List<Post> postList;
 
     private static SyncHttpClient client;
     private SharedPreferences pref;
-
     private JSONArray children;
 
     public RemoteDataOAuth(HomePage homepage) {
@@ -54,14 +50,12 @@ public class RemoteDataOAuth extends AsyncTask<String, Void, String> {
     @Override
     protected String doInBackground(String... url) {
         Log.i("token", pref.getString("token", ""));
-        //  client.addHeader("Authorization", "bearer " + pref.getString("token", ""));
-        // client.addHeader("User-Agent", "Redditsavedoffline/0.1 by pratik");
 
         Header[] headers = new Header[2];
         headers[0] = new BasicHeader("User-Agent", "myRedditapp/0.1 by redditusername");
         headers[1] = new BasicHeader("Authorization", "bearer " + pref.getString("token", ""));
 
-        client.get(homepage.getActivity(), "https://oauth.reddit.com", headers, null, new JsonHttpResponseHandler() {
+        client.get(homepage.getActivity(), url[0], headers, null, new JsonHttpResponseHandler() {
 
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
