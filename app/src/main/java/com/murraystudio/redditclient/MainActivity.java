@@ -80,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
         }
         postList = new ArrayList<Post>();
 
-        
+
         // Create a new Fragment to be placed in the activity layout
         homePageFragment = new HomePage();
         // Replace whatever is in the fragment_container view with this fragment,
