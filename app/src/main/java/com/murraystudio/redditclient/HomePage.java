@@ -57,6 +57,7 @@ public class HomePage extends Fragment implements SwipeRefreshLayout.OnRefreshLi
         View rootView = inflater.inflate(R.layout.home_page, container, false);
         rootView.setTag(TAG);
 
+        //swipe down to refresh data
         swipeRefreshLayout =  (SwipeRefreshLayout) rootView.findViewById(R.id.home_page_swipe_refresh);
         swipeRefreshLayout.setOnRefreshListener(this);
 
@@ -80,7 +81,7 @@ public class HomePage extends Fragment implements SwipeRefreshLayout.OnRefreshLi
 
 
         if(postList == null || postList.size() == 0) {
-            fetchPosts("all");
+            fetchPosts("all"); //upon start up, load posts from r/all
         }
         else{
             setAdapter(postList);
@@ -140,17 +141,20 @@ public class HomePage extends Fragment implements SwipeRefreshLayout.OnRefreshLi
         fetchPosts(currentSubreddit);
     }
 
+    //fetch posts using RemoteData without the need for OAuth. Parameter allows for a specific subreddit to visit.
     public void fetchPosts(String subreddit) {
         new RemoteData(this).execute("https://www.reddit.com/r/" + subreddit + "/.json");
         currentSubreddit = subreddit;
         ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("r/" + subreddit);
     }
 
-    public void fetchPosts2(){
+    //fetch posts from the frontpage using RemoteDataOAuth which requires OAuth parameter
+    public void fetchPostsOAuth(){
         new RemoteDataOAuth(this).execute("https://oauth.reddit.com");
         ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Frontpage");
     }
 
+    //refresh post list with new ones from network refresh
     public void onPostFetchComplete(List<Post> postList){
         this.postList = postList;
         swipeRefreshLayout.setRefreshing(false);

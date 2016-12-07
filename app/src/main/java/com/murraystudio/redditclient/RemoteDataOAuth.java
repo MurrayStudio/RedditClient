@@ -23,7 +23,7 @@ import static com.murraystudio.redditclient.MainActivity.CLIENT_SECRET;
 
 /**
  * This class shall serve as a utility class that handles network
- * connections.
+ * connections using OAuth
  */
 
 public class RemoteDataOAuth extends AsyncTask<String, Void, String> {
@@ -51,6 +51,7 @@ public class RemoteDataOAuth extends AsyncTask<String, Void, String> {
     protected String doInBackground(String... url) {
         Log.i("token", pref.getString("token", ""));
 
+        //HTTP headers need to have the access token to perform GET requests from Reddit for the user.
         Header[] headers = new Header[2];
         headers[0] = new BasicHeader("User-Agent", "myRedditapp/0.1 by redditusername");
         headers[1] = new BasicHeader("Authorization", "bearer " + pref.getString("token", ""));
@@ -62,7 +63,7 @@ public class RemoteDataOAuth extends AsyncTask<String, Void, String> {
                 Log.i("response frontpage", response.toString());
 
                 try {
-                    children = response.getJSONObject("data").getJSONArray("children");
+                    children = response.getJSONObject("data").getJSONArray("children"); //get children JSON data for posts
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -90,6 +91,7 @@ public class RemoteDataOAuth extends AsyncTask<String, Void, String> {
         postList = new ArrayList<Post>();
 
         try {
+            //go through each JSON child and get the post data needed to populate our post cards.
             for (int i = 0; i < children.length(); i++) {
                 JSONObject cur = children.getJSONObject(i)
                         .getJSONObject("data");

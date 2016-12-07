@@ -17,15 +17,13 @@ import java.util.List;
 
 /**
  * This class shall serve as a utility class that handles network
- * connections.
- *
+ * connections that are not OAuth.
  */
 
 public class RemoteData extends AsyncTask<String, Void, String> {
 
     private HomePage homepage;
     private List<Post> postList;
-    private String after; //for the next set of posts
 
     public RemoteData(HomePage homepage){
         this.homepage = homepage;
@@ -94,10 +92,7 @@ public class RemoteData extends AsyncTask<String, Void, String> {
                     .getJSONObject("data");
             JSONArray children=data.getJSONArray("children");
 
-            //Using this property we can fetch the next set of
-            //posts from the same subreddit
-            after = data.getString("after");
-
+            //go through each JSON child and get the post data needed to populate our post cards.
             for(int i=0;i<children.length();i++){
                 JSONObject cur = children.getJSONObject(i)
                         .getJSONObject("data");

@@ -14,7 +14,7 @@ import com.bumptech.glide.Glide;
 import java.util.List;
 
 /**
- * Created by sushi_000 on 11/3/2016.
+ * This adapter populates the post data into our recycleview list into each post card view.
  */
 
 public class HomePageAdapter extends RecyclerView.Adapter<HomePageAdapter.MyViewHolder> {
@@ -30,6 +30,7 @@ public class HomePageAdapter extends RecyclerView.Adapter<HomePageAdapter.MyView
         public TextView mTitleView;
         public TextView mPostTextView;
         public TextView mSubredditTextView;
+        public TextView mScore;
         public ImageView mImageView;
         public MyViewHolder(View v) {
             super(v);
@@ -38,6 +39,7 @@ public class HomePageAdapter extends RecyclerView.Adapter<HomePageAdapter.MyView
             mTitleView = (TextView) v.findViewById(R.id.title);
             mPostTextView = (TextView) v.findViewById(R.id.post_text);
             mSubredditTextView = (TextView) v.findViewById(R.id.subreddit);
+            mScore = (TextView) v.findViewById(R.id.score);
             mImageView = (ImageView) v.findViewById(R.id.media);
         }
     }
@@ -60,12 +62,13 @@ public class HomePageAdapter extends RecyclerView.Adapter<HomePageAdapter.MyView
 
     @Override
     public void onBindViewHolder(HomePageAdapter.MyViewHolder holder, int position) {
-        holder.mTitleView.setText(postList.get(position).title);
-        holder.mSubredditTextView.setText(postList.get(position).subreddit);
+        holder.mTitleView.setText(postList.get(position).getTitle());
+        holder.mSubredditTextView.setText("r/" + postList.get(position).getSubreddit());
+        holder.mScore.setText("Score: " + postList.get(position).getScore());
 
         if (postList.get(position).selfText.isEmpty() == false){
             holder.mPostTextView.setVisibility(View.VISIBLE);
-            holder.mPostTextView.setText(postList.get(position).selfText);
+            holder.mPostTextView.setText(postList.get(position).getSelfText());
         }
         else{
             //need an else so when the recycle happens it doesn't create text in wrong places

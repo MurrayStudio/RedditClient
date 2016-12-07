@@ -17,16 +17,16 @@ public class Post {
     String domain;
     String id;
 
-    String getDetails(){
-        String details=author
-                +" posted this and got "
-                +numComments
-                +" replies";
-        return details;
-    }
-
     String getTitle(){
         return title;
+    }
+
+    String getSubreddit(){
+        return subreddit;
+    }
+
+    String getSelfText(){
+        return selfText;
     }
 
     String getScore(){
